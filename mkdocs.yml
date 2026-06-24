@@ -3,11 +3,13 @@ site_description: >-
   User documentation for Hax (hax-em), a suite of tools to study conformational
   heterogeneity in Cryo-EM data with JAX-powered neural networks.
 site_author: David Herreros and contributors
-site_url: https://davidherreros.github.io/hax-em/
+site_url: https://davidherreros.github.io/hax-em-docs/
 
+# Header GitHub button points at the main code repository so visitors find the
+# software, while "Edit this page" links target the separate documentation repo.
 repo_name: DavidHerreros/hax-em
 repo_url: https://github.com/DavidHerreros/hax-em
-edit_uri: edit/main/docs/
+edit_uri_template: https://github.com/DavidHerreros/hax-em-docs/edit/main/docs/{path}
 
 copyright: Copyright &copy; David Herreros and the Hax contributors
 
@@ -52,6 +54,7 @@ theme:
     - search.suggest
     - search.highlight
     - search.share
+    - content.action.edit
     - content.code.copy
     - content.code.annotate
     - content.tabs.link
