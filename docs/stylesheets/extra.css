@@ -1,0 +1,230 @@
+/* ---------------------------------------------------------------------------
+   Hax documentation — custom styling on top of Material for MkDocs
+   --------------------------------------------------------------------------- */
+
+:root {
+  --md-primary-fg-color: #4f46e5;
+  --md-primary-fg-color--light: #6366f1;
+  --md-primary-fg-color--dark: #3730a3;
+  --md-accent-fg-color: #7c3aed;
+  --hax-grad: linear-gradient(100deg, #6366f1 0%, #7c3aed 45%, #ec4899 100%);
+}
+
+[data-md-color-scheme="slate"] {
+  --md-hue: 232;
+}
+
+/* Bigger, friendlier logo in the header */
+.md-header__button.md-logo img {
+  height: 1.9rem;
+}
+
+/* ===========================================================================
+   Hero block (landing page)
+   =========================================================================== */
+.hax-hero {
+  position: relative;
+  text-align: center;
+  padding: 3rem 1rem 1.6rem;
+  overflow: hidden;
+  animation: hax-fade-up 0.8s ease both;
+}
+
+/* Soft animated glow behind the hero */
+.hax-hero::before {
+  content: "";
+  position: absolute;
+  inset: -40% 0 auto 0;
+  height: 420px;
+  background:
+    radial-gradient(closest-side, rgba(99, 102, 241, 0.28), transparent 70%),
+    radial-gradient(closest-side, rgba(236, 72, 153, 0.22), transparent 70%);
+  background-position: 30% 30%, 75% 20%;
+  background-repeat: no-repeat;
+  background-size: 55% 100%, 45% 90%;
+  filter: blur(8px);
+  z-index: -1;
+  animation: hax-drift 14s ease-in-out infinite alternate;
+}
+
+.hax-hero img {
+  max-width: 220px;
+  width: 60%;
+  margin-bottom: 1rem;
+  animation: hax-float 6s ease-in-out infinite;
+  filter: drop-shadow(0 10px 24px rgba(79, 70, 229, 0.25));
+}
+
+.hax-hero h1 {
+  font-weight: 800;
+  font-size: 2.3rem;
+  line-height: 1.15;
+  margin: 0.2rem 0 0.4rem;
+  background: var(--hax-grad);
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: hax-shine 7s linear infinite;
+}
+
+.hax-hero p.hax-tagline {
+  font-size: 1.05rem;
+  color: var(--md-default-fg-color--light);
+  max-width: 640px;
+  margin: 0 auto 1.4rem;
+}
+
+/* ===========================================================================
+   Call-to-action buttons
+   =========================================================================== */
+.hax-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+  margin-bottom: 1.6rem;
+}
+
+.md-typeset .md-button {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.md-typeset .md-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(79, 70, 229, 0.28);
+}
+
+.md-typeset .md-button--primary:hover {
+  border-color: var(--md-accent-fg-color);
+  background-color: var(--md-accent-fg-color);
+}
+
+.hax-badges img {
+  margin: 0.15rem;
+}
+
+/* ===========================================================================
+   Showcase graphic (animated SVG landscape on the home page)
+   =========================================================================== */
+.hax-showcase {
+  margin: 0 auto 1.4rem;
+  max-width: 760px;
+  text-align: center;
+  animation: hax-fade-up 0.9s ease both;
+}
+
+.hax-showcase svg {
+  width: 100%;
+  height: auto;
+  border-radius: 18px;
+  box-shadow: 0 18px 50px rgba(49, 46, 129, 0.35);
+}
+
+.hax-showcase figcaption {
+  margin-top: 0.7rem;
+  font-size: 0.85rem;
+  color: var(--md-default-fg-color--light);
+}
+
+/* Optional: framed look for a real screenshot / GIF dropped onto the landing page */
+.hax-demo {
+  display: block;
+  margin: 0 auto;
+  max-width: 760px;
+  width: 100%;
+  border-radius: 14px;
+  box-shadow: 0 18px 50px rgba(49, 46, 129, 0.35);
+}
+
+/* ===========================================================================
+   Material "grid cards" — extra polish + animated hover
+   =========================================================================== */
+.md-typeset .grid.cards > ul > li,
+.md-typeset .grid.cards > ol > li,
+.md-typeset .grid > .card {
+  border-radius: 0.7rem;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.md-typeset .grid.cards > ul > li:hover,
+.md-typeset .grid.cards > ol > li:hover {
+  transform: translateY(-5px);
+  border-color: var(--md-accent-fg-color);
+  box-shadow: 0 14px 34px rgba(79, 70, 229, 0.16);
+}
+
+/* Gradient-tinted icons inside cards */
+.md-typeset .grid.cards .twemoji svg,
+.md-typeset .grid.cards .twemoji.lg svg {
+  fill: var(--md-accent-fg-color);
+}
+
+.md-typeset .grid.cards .twemoji.lg svg {
+  height: 2rem;
+  width: 2rem;
+}
+
+/* Slightly tighter tables for the long parameter lists */
+.md-typeset table:not([class]) td,
+.md-typeset table:not([class]) th {
+  padding: 0.5rem 0.7rem;
+}
+
+/* ===========================================================================
+   Scroll-reveal (applied by javascripts/extra.js)
+   =========================================================================== */
+.hax-pre {
+  opacity: 0;
+  transform: translateY(24px);
+  will-change: opacity, transform;
+}
+
+.hax-in {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* Stagger cards within the same grid for a cascading reveal */
+.md-typeset .grid.cards > ul > li.hax-in:nth-child(2) { transition-delay: 0.08s; }
+.md-typeset .grid.cards > ul > li.hax-in:nth-child(3) { transition-delay: 0.16s; }
+.md-typeset .grid.cards > ul > li.hax-in:nth-child(4) { transition-delay: 0.24s; }
+
+/* ===========================================================================
+   Keyframes
+   =========================================================================== */
+@keyframes hax-shine {
+  to { background-position: 220% center; }
+}
+
+@keyframes hax-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-9px); }
+}
+
+@keyframes hax-fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes hax-drift {
+  from { transform: translateX(-3%) scale(1); }
+  to { transform: translateX(3%) scale(1.08); }
+}
+
+/* ===========================================================================
+   Respect users who prefer reduced motion
+   =========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .hax-hero,
+  .hax-hero::before,
+  .hax-hero img,
+  .hax-hero h1 {
+    animation: none !important;
+  }
+  .hax-pre { opacity: 1; transform: none; }
+  .hax-in { transition: none; }
+  .md-typeset .md-button:hover,
+  .md-typeset .grid.cards > ul > li:hover { transform: none; }
+}

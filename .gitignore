@@ -1,0 +1,11 @@
+# MkDocs build output
+site/
+
+# Material for MkDocs build cache
+.cache/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/

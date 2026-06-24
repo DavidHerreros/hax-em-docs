@@ -1,0 +1,146 @@
+site_name: Hax — Heterogeneity Analysis for CryoEM
+site_description: >-
+  User documentation for Hax (hax-em), a suite of tools to study conformational
+  heterogeneity in Cryo-EM data with JAX-powered neural networks.
+site_author: David Herreros and contributors
+site_url: https://davidherreros.github.io/hax-em/
+
+repo_name: DavidHerreros/hax-em
+repo_url: https://github.com/DavidHerreros/hax-em
+edit_uri: edit/main/docs/
+
+copyright: Copyright &copy; David Herreros and the Hax contributors
+
+theme:
+  name: material
+  logo: assets/logo.png
+  favicon: assets/logo.png
+  language: en
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to system preference
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - navigation.footer
+    - navigation.tracking
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/extra.js
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      title: On this page
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.keys
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+plugins:
+  - search
+  - social:
+      cards_layout_options:
+        background_color: "#4f46e5"
+        color: "#ffffff"
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/DavidHerreros/hax-em
+      name: Hax on GitHub
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/hax-em/
+      name: hax-em on PyPI
+  generator: false
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - The Command Line: getting-started/cli.md
+      - Core Concepts: getting-started/concepts.md
+  - Programs:
+      - Overview: programs/index.md
+      - Heterogeneity Analysis:
+          - HetSIREN: programs/hetsiren.md
+          - Zernike3Deep: programs/zernike3deep.md
+          - ReconSIREN: programs/reconsiren.md
+      - Consensus & Deconvolution:
+          - FlexConsensus: programs/flexconsensus.md
+          - Estimate Latent Covariances: programs/estimate_latent_covariances.md
+          - Latent Space Deconvolution: programs/latent_space_deconvolution.md
+      - Gray-Scale Adjustment:
+          - Image Gray-Scale Adjustment: programs/image_gray_scale_adjustment.md
+          - Volume Gray-Scale Adjustment: programs/volume_gray_scale_adjustment.md
+      - Latent Post-Processing:
+          - Decode States from Latents: programs/decode_states_from_latents.md
+          - Filter Latents: programs/filter_latents.md
+      - Reconstruction:
+          - MoDART: programs/modart.md
+      - Visualization:
+          - Annotate Space: programs/annotate_space.md
+          - Display Metrics: programs/display_metrics.md
+  - Workflows:
+      - Pipelines: workflows/pipelines.md
+      - Real-Case Examples: workflows/examples.md
+  - Support:
+      - Contact & Support: support/contact.md
