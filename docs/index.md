@@ -196,6 +196,11 @@ language.
 CUDA itself is installed for you — you only need a recent NVIDIA driver (≥ 525). See the
 full [installation guide](getting-started/installation.md) for the recommended Conda setup.
 
+!!! tip "Two ways to run Hax"
+    Use the [command line](getting-started/cli.md), or run every program from your browser with
+    the optional [Hax GUI](getting-started/gui.md). After installing, you can
+    [verify everything works](getting-started/testing.md) with the built-in test suite.
+
 ---
 
 ## A typical session

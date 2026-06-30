@@ -4,6 +4,10 @@ Everything in Hax is launched through a **single command**: `hax_project_manager
 *dispatcher* — you tell it which program you want to run, on which GPU, and then pass that
 program's own arguments.
 
+!!! tip "Prefer a graphical interface?"
+    Everything on this page can also be done from your browser with the optional
+    [Hax GUI](gui.md) (`hax-em-gui`), which turns each program into an auto-generated form.
+
 ## The general pattern
 
 ```bash

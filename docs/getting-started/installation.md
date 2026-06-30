@@ -64,6 +64,15 @@ hax_project_manager -h
 You should see a summary of every Hax program. If you do, you are ready to go — continue to
 [The Command Line](cli.md) to learn how launching works.
 
+!!! tip "Want a thorough check?"
+    To confirm the whole GPU stack (JAX, CUDA, cuML…) works end to end — not just that the
+    CLI imports — run the built-in test suite on a synthetic phantom. See
+    [Verify Your Installation](testing.md).
+
+!!! info "Prefer a graphical interface?"
+    There is an optional web GUI, `hax-em-gui`, that lets you run every program from your
+    browser. See [The Hax GUI](gui.md).
+
 !!! warning "If JAX cannot see your GPU"
     If programs run very slowly or report that no GPU was found:
 
