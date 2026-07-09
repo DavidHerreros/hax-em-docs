@@ -38,6 +38,43 @@ To help us reproduce and fix a problem quickly, please include:
 
 ---
 
+## Report a graphical interface (GUI) issue or improvement
+
+Problems, questions and suggestions about the **Hax graphical interface** belong in its own
+GitHub issue tracker, which is separate from the core `hax-em` one:
+
+<div class="hax-buttons" markdown>
+[:material-github: Open an issue on GitHub](https://github.com/DavidHerreros/hax-em-gui/issues){ .md-button .md-button--primary }
+[:material-source-repository: Browse the repository](https://github.com/DavidHerreros/hax-em-gui){ .md-button }
+</div>
+
+As above, please **search the existing issues** before opening a new one — someone may have
+already reported the same thing.
+
+### Writing a useful GUI report
+
+Because the interface is visual, **screenshots are the single most helpful thing you can
+attach** — both for bugs and for improvement ideas:
+
+- [x] **Screenshots** — capture the screen showing the problem (or the part you'd like to see
+      improved). For a bug, include the moment the error or unexpected behaviour appears; for a
+      suggestion, mark up the screenshot to show what you have in mind. You can drag-and-drop
+      images straight into the GitHub issue text box.
+- [x] **What you were doing** — the steps that led to the issue (which panel, which buttons,
+      which program you were launching).
+- [x] **What happened** vs. **what you expected** to happen instead.
+- [x] **Any error text** — messages shown in the interface, and anything printed in the
+      terminal / console the GUI was started from (copied as text).
+- [x] **Your environment** — the GUI version, your operating system and browser (if you use the
+      web interface), and the Hax version (`python -c "import hax; print(hax.__version__)"`).
+
+!!! tip "Capturing a screenshot"
+    On most systems: **Windows** — ++win+shift+s++; **macOS** — ++cmd+shift+4++;
+    **Linux** — the *Screenshot* utility or ++print++. Recording a short screen capture (GIF or
+    video) is even better when the problem only shows up while interacting with the interface.
+
+---
+
 ## Tutorials
 
 Step-by-step tutorials covering the use of Hax together with **Scipion** are in preparation.
