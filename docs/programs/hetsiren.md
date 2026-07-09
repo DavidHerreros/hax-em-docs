@@ -104,6 +104,10 @@ training on noisy data (reproducing the EMAN2/e2gmm band-limited-FRC recipe).
 | `--freq_anneal_epochs` | float | 0.0 | Coarse-to-fine annealing window: initial epochs over which the effective resolution (decoder SIREN `w0` and the FRC loss band) ramps up from `--freq_anneal_start` to full resolution, forcing low-frequency structure to be fit before high-frequency detail. `0` disables (full resolution from the first step). |
 | `--freq_anneal_start` | float | 0.2 | Starting fraction (in (0, 1]) for the annealing: the resolution factor begins here and ramps linearly to 1.0. Smaller = coarser start. Ignored when `--freq_anneal_epochs` is 0. |
 | `--sigma_anneal_factor` | float | 1.0 | Band-limits the Gaussian representation for the FRC loss: the render width starts at this factor × base sigma (broad, low-resolution blobs) and shrinks to the base width on the same clock as `--freq_anneal_epochs`. Only affects mass-transport rendering and requires `--freq_anneal_epochs > 0`. `1.0` disables; typical 2–2.5. |
+| `--schedule_recon_split` | flag | off | Schedule the mass-transport reconstruction split instead of the fixed `0.1 / 0.9` weighting. The reconstruction loss blends an **amplitude** pathway (learned densities at frozen positions) and a **mass-transport** pathway (fixed reference densities at learned positions); the amplitude weight ramps from `--recon_split_start` to `--recon_split_final` (the motion term takes the complement). Starting near `0` makes early training explain the data almost purely by moving mass, so large-amplitude motions converge faster before the amplitude head absorbs residual density changes. Only meaningful with `--transport_mass`. Off = fixed `--recon_split_final` throughout (the historical `0.1 / 0.9`). |
+| `--recon_split_start` | float | 0.0 | Amplitude-term weight at the **start** of training when `--schedule_recon_split` is on. `0.0` = pure mass transport early (reconstruction explained entirely by motion). Ignored when scheduling is off. |
+| `--recon_split_final` | float | 0.1 | Amplitude-term weight at the **end** of the ramp — and the fixed weight used throughout when `--schedule_recon_split` is off. `0.1` reproduces the historical `0.1 / 0.9` split. The motion term always takes the complement (`1 −` this). |
+| `--recon_split_epochs` | float | 0.0 | Epochs over which the amplitude weight ramps from `--recon_split_start` to `--recon_split_final` when scheduling is on. Left at `0`, it rides the coarse-to-fine clock and reuses `--freq_anneal_epochs` (amplitude is phased in as resolution refines); if both are `0` the weight jumps straight to `--recon_split_final`. |
 
 ### Training control
 
@@ -196,3 +200,8 @@ After **predict**:
   `--local_reconstruction` (with a reference volume) takes this further.
 - `--implicit_network` is the most accurate option for subtle local motion, at a memory
   cost.
+- **Large-amplitude motions converging slowly (with `--transport_mass`)?** Give the moving
+  Gaussians room to travel: enable coarse-to-fine rendering (`--freq_anneal_epochs` with
+  `--sigma_anneal_factor` 2–2.5) so early gradients carry over large displacements, prefer
+  `--arap_lambda` over a stiff `--deformation_lambda`, and turn on `--schedule_recon_split` so
+  early training explains the data by *moving* mass before the amplitude head is phased in.
