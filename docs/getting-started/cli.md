@@ -64,6 +64,28 @@ hax_project_manager --gpu 0,1 hetsiren ...
     must appear between `hax_project_manager` and the program name — not among the program's
     own arguments.
 
+## Reusing parameters with `--config`
+
+Every program accepts a `--config` option pointing at a **YAML or JSON file** whose keys are
+argument names without the leading `--`:
+
+```yaml
+# my_run.yml
+sr: 1.5
+ctf_type: apply
+epochs: 80
+batch_size: 16
+```
+
+```bash
+hax_project_manager --gpu 0 hetsiren --config my_run.yml --md particles.xmd --output_path run/
+```
+
+Values from the file act as **defaults**; anything you also pass on the command line
+**overrides** them. On every run the fully-resolved parameters are written to
+`<output_path>/run_config.json`, and that file can itself be reused as a `--config` to
+reproduce the run exactly.
+
 ## What the dispatcher sets up for you
 
 When you launch a program, `hax_project_manager` automatically configures a few things so

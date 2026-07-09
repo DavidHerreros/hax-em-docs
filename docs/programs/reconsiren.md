@@ -52,9 +52,17 @@ alongside HetSIREN:
 |--------|------|---------|-------------|
 | `--vol` | path | — | Starting volume to assign angles/shifts against (otherwise ab initio). |
 | `--mask` | path | — | Binary reconstruction mask covering the region where the relevant signal/motion lives. |
+| `--num_gaussians` | int | auto | When a reference volume (`--vol`) is given, the number of Gaussians used to recreate it before training. By default the count is chosen automatically for high fidelity; set it to fix the number yourself (e.g. to the number of residues). |
 | `--do_not_learn_volume` | flag | off | Only learn an angular assignment with shifts — do not learn a map. Useful with a high-resolution reference that needs no refinement. |
 | `--refine_current_assignment` | flag | off | Refine the angles/shifts already present in the metadata instead of finding them ab initio. |
 | `--symmetry_group` | str | `c1` | Point-group symmetry to consider. Only `c*` and `d*` groups are supported (lower-case). Even with symmetry set, a symmetry-broken `c1` set of angles is learned, so the angles can be used directly in a downstream reconstruction/refinement. |
+
+### Pose search
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `--num_components` | int | 18 | Number of candidate pose hypotheses the encoder proposes per image during the ab initio search: for each image it evaluates this many orientations (anchored on a spherical grid), renders a projection for each, and keeps the best match. Higher covers orientation space more densely and is more robust to local minima, but increases GPU memory and compute roughly linearly (the main driver of ReconSIREN's training footprint). Lower it to fit a smaller GPU at the cost of a coarser search. |
+| `--do_not_use_anchor_rotations` | flag | off | By default the proposed poses are composed with a fixed set of anchor rotations spread over a spherical grid (one per hypothesis), biasing the ab initio search to cover orientation space more evenly. Provide this to disable that composition. |
 
 ### Training control
 
