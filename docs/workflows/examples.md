@@ -23,6 +23,34 @@ are written to be realistic and copy-paste-friendly.
 **Goal:** starting from aligned particles and a consensus map, estimate the continuous motion
 of a flexible complex, explore it, and reconstruct a **motion-corrected** map.
 
+### Step 0 · (optional) Preprocess to fit your GPU
+
+If a 256-box does not fit, or you just want the exploration to go faster, shrink the particles
+**and** the volumes to a 128-box before anything else:
+
+```bash
+hax_project_manager --gpu 0 preprocess_particles \
+    --md particles.xmd \
+    --sr 1.5 \
+    --new_box_size 128 \
+    --output_path 00_preprocessed/
+
+hax_project_manager preprocess_volumes \
+    --vol reference.mrc mask.mrc \
+    --sr 1.5 \
+    --new_box_size 128 \
+    --output_path 00_preprocessed/
+```
+
+This costs resolution — the Nyquist limit moves from 3.0 Å to 6.0 Å — and buys roughly **4× less
+VRAM** and a proportionally faster run. See [Stage 0](pipelines.md#stage-0-preprocess-optional-but-often-worth-it).
+
+!!! note "If you take this route, substitute throughout the rest of the example"
+    `--md 00_preprocessed/preprocessed_particles.xmd`,
+    `--vol 00_preprocessed/reference_preprocessed.mrc`,
+    `--mask 00_preprocessed/mask_preprocessed.mrc`, and **`--sr 3.0`** instead of `1.5`.
+    The steps below are written against the original, full-size files.
+
 ### Step 1 · Train the motion model
 
 ```bash

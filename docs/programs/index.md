@@ -1,7 +1,7 @@
 # Programs Overview
 
-Hax bundles thirteen command-line programs, all launched through `hax_project_manager`
-(see [The Command Line](../getting-started/cli.md)). They fall into six families, listed
+Hax bundles fifteen command-line programs, all launched through `hax_project_manager`
+(see [The Command Line](../getting-started/cli.md)). They fall into seven families, listed
 below in roughly the order you would use them in a project.
 
 !!! tip "Every program page follows the same layout"
@@ -10,6 +10,31 @@ below in roughly the order you would use them in a project.
     first.
 
 ---
+
+## Preprocessing
+
+Optional, but often the first thing you run: shrink the box to trade resolution for speed and
+VRAM, and correct the CTF once instead of every epoch.
+
+<div class="grid cards" markdown>
+
+-   :material-image-size-select-small:{ .lg .middle } &nbsp; __Preprocess Particles__
+
+    ---
+
+    Resize/crop a particle stack and optionally Wiener- or phase-flip-correct it.
+
+    [:octicons-arrow-right-24: Preprocess Particles](preprocess_particles.md)
+
+-   :material-cube-scan:{ .lg .middle } &nbsp; __Preprocess Volumes__
+
+    ---
+
+    Resize/crop reference maps and masks to match a preprocessed particle set.
+
+    [:octicons-arrow-right-24: Preprocess Volumes](preprocess_volumes.md)
+
+</div>
 
 ## Heterogeneity analysis
 
@@ -167,6 +192,8 @@ Utilities to turn latent spaces into volumes or to clean them up.
 
 | Program | CLI name | Family | Trains a network? |
 |---------|----------|--------|:---:|
+| [Preprocess Particles](preprocess_particles.md) | `preprocess_particles` | Preprocessing | ❌ |
+| [Preprocess Volumes](preprocess_volumes.md) | `preprocess_volumes` | Preprocessing | ❌ |
 | [HetSIREN](hetsiren.md) | `hetsiren` | Heterogeneity | ✅ |
 | [Zernike3Deep](zernike3deep.md) | `zernike3deep` | Heterogeneity | ✅ |
 | [ReconSIREN](reconsiren.md) | `reconsiren` | Heterogeneity | ✅ |

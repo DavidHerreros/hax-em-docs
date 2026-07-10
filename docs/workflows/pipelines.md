@@ -14,7 +14,10 @@ maps. This page shows how the pieces fit together so you can plan a project end 
 
 ```mermaid
 flowchart TD
-    A[Particle images + metadata<br/>.xmd / .star / .cs] --> B{Have reliable<br/>poses & a map?}
+    A[Particle images + metadata<br/>.xmd / .star / .cs] --> P{Box too big for<br/>your GPU or budget?}
+    P -- Yes --> Q[Preprocess Particles + Volumes<br/>smaller box, optional CTF correction]
+    P -- No --> B{Have reliable<br/>poses & a map?}
+    Q --> B
     B -- No --> C[ReconSIREN<br/>ab initio pose / shift + initial volume]
     B -- Yes --> D[Heterogeneity analysis]
     C --> D
@@ -34,6 +37,47 @@ flowchart TD
     J --> L[Final volumes / movies]
     K --> L
 ```
+
+---
+
+## Stage 0 — Preprocess (optional, but often worth it)
+
+Everything downstream reads the same particles over and over. Shrinking them **once** is the
+cheapest lever you have on VRAM and wall-clock time — and the one that costs you resolution, so
+spend it deliberately.
+
+- **[Preprocess Particles](../programs/preprocess_particles.md)** — crop and/or downsample the
+  stack, and optionally correct the CTF (Wiener or phase flip) once instead of every epoch.
+- **[Preprocess Volumes](../programs/preprocess_volumes.md)** — put the reference map and its mask
+  on the *same* box and sampling rate.
+
+Halving the box divides the pixel count — and roughly the memory a network needs — by **four**,
+while training gets correspondingly faster. What you give up is resolution: the new Nyquist
+frequency becomes `2 × sr × box_in / box_out` Å, and **no downstream program can recover detail
+beyond it**. A common, honest strategy is to explore on a small box and, once the landscape and
+the parameters are settled, repeat the final run at full size.
+
+```mermaid
+flowchart LR
+    A[particles.xmd<br/>256 box @ 1.5 A/px] --> B[Preprocess Particles<br/>--new_box_size 128]
+    C[reference.mrc + mask.mrc] --> D[Preprocess Volumes<br/>--new_box_size 128]
+    B --> E[128 box @ 3.0 A/px<br/>4x less VRAM]
+    D --> E
+    E --> F[Stage 1 / Stage 2]
+```
+
+!!! warning "Three things to carry forward"
+    - **Pass the new `--sr`** (printed by the program) to every downstream run.
+    - If you used `--ctf_correction`, run downstream programs with **`--ctf_type None`** — the
+      images are already corrected, and doing it twice corrupts the analysis.
+    - Preprocess the **volume and the mask with the same settings** as the particles, or the
+      projections will not line up with the images.
+
+!!! tip "If preprocessing itself runs out of memory"
+    Preprocessing a large box is the one step that can OOM *before* you have shrunk anything. Pass
+    **`--batch_size auto`** to
+    [Preprocess Particles](../programs/preprocess_particles.md#-batch_size-auto) and it will size
+    the batch to your card analytically. It exists to make a big box fit, not to go faster.
 
 ---
 

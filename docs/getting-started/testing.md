@@ -78,11 +78,19 @@ program/scenario is marked `FAIL` in the output.
 
 The suite drives the following programs through their CLIs:
 
-`hetsiren`, `zernike3deep`, `estimate_latent_covariances`, `latent_space_deconvolution`,
+`preprocess_particles`, `preprocess_volumes`, `hetsiren`, `reconsiren`, `reconsiren_het_only`,
+`zernike3deep`, `estimate_latent_covariances`, `latent_space_deconvolution`,
 `filter_latents`, `flexconsensus`, `decode_states_from_latents`, `modart`, `annotate_space`,
 `image_gray_scale_adjustment`, `volume_gray_scale_adjustment`, `display_metrics`.
 
 Run `python tests/run_tests.py --help` to see the exact, up-to-date list for your version.
+
+Most scenarios check that a program **runs**: it exits cleanly and writes the outputs it
+promised. The two preprocessing programs go further — because their contract is exact,
+their runs are followed by a verification step that reads the results back and checks the
+sampling rate, the rescaled in-plane shifts and the resized pixel data against values
+recomputed independently with NumPy. So a `preprocess_particles` run that quietly forgot
+to rescale the shifts would fail the suite, not pass it.
 
 ---
 

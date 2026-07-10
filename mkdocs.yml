@@ -125,6 +125,9 @@ nav:
       - Core Concepts: getting-started/concepts.md
   - Programs:
       - Overview: programs/index.md
+      - Preprocessing:
+          - Preprocess Particles: programs/preprocess_particles.md
+          - Preprocess Volumes: programs/preprocess_volumes.md
       - Heterogeneity Analysis:
           - HetSIREN: programs/hetsiren.md
           - Zernike3Deep: programs/zernike3deep.md
