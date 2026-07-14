@@ -1,6 +1,6 @@
 # Programs Overview
 
-Hax bundles fifteen command-line programs, all launched through `hax_project_manager`
+Hax bundles sixteen command-line programs, all launched through `hax_project_manager`
 (see [The Command Line](../getting-started/cli.md)). They fall into seven families, listed
 below in roughly the order you would use them in a project.
 
@@ -154,6 +154,14 @@ Utilities to turn latent spaces into volumes or to clean them up.
 
 <div class="grid cards" markdown>
 
+-   :material-cube:{ .lg .middle } &nbsp; __Reconstruct Volume__
+
+    ---
+
+    Single-pass consensus map from posed particles, FSC-denoised and gray-scale calibrated.
+
+    [:octicons-arrow-right-24: Reconstruct Volume](reconstruct_volume.md)
+
 -   :material-blur:{ .lg .middle } &nbsp; __MoDART__
 
     ---
@@ -204,6 +212,7 @@ Utilities to turn latent spaces into volumes or to clean them up.
 | [Volume Gray-Scale Adjustment](volume_gray_scale_adjustment.md) | `volume_gray_scale_adjustment` | Adjustment | ✅ |
 | [Decode States from Latents](decode_states_from_latents.md) | `decode_states_from_latents` | Post-processing | ❌ |
 | [Filter Latents](filter_latents.md) | `filter_latents` | Post-processing | ❌ |
+| [Reconstruct Volume](reconstruct_volume.md) | `reconstruct_volume` | Reconstruction | ❌ |
 | [MoDART](modart.md) | `modart` | Reconstruction | ❌* |
 | [Annotate Space](annotate_space.md) | `annotate_space` | Visualization | ❌ |
 | [Display Metrics](display_metrics.md) | `display_metrics` | Visualization | ❌ |

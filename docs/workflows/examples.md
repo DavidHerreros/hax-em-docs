@@ -271,6 +271,7 @@ explore with [Annotate Space](../programs/annotate_space.md).
 | If you want to… | Start here |
 |-----------------|------------|
 | Get poses / an initial map from scratch | [ReconSIREN](../programs/reconsiren.md) |
+| Build a consensus map from particles you already posed | [Reconstruct Volume](../programs/reconstruct_volume.md) |
 | Model smooth motion from a good reference | [Zernike3Deep](../programs/zernike3deep.md) |
 | Do flexible real-space reconstruction | [HetSIREN](../programs/hetsiren.md) |
 | Merge / validate multiple landscapes | [FlexConsensus](../programs/flexconsensus.md) |

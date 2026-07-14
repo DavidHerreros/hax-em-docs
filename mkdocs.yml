@@ -143,6 +143,7 @@ nav:
           - Decode States from Latents: programs/decode_states_from_latents.md
           - Filter Latents: programs/filter_latents.md
       - Reconstruction:
+          - Reconstruct Volume: programs/reconstruct_volume.md
           - MoDART: programs/modart.md
       - Visualization:
           - Annotate Space: programs/annotate_space.md

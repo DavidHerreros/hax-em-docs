@@ -18,9 +18,11 @@ flowchart TD
     P -- Yes --> Q[Preprocess Particles + Volumes<br/>smaller box, optional CTF correction]
     P -- No --> B{Have reliable<br/>poses & a map?}
     Q --> B
-    B -- No --> C[ReconSIREN<br/>ab initio pose / shift + initial volume]
+    B -- No poses --> C[ReconSIREN<br/>ab initio pose / shift + initial volume]
+    B -- Poses, no map --> R[Reconstruct Volume<br/>consensus map + mask from the poses]
     B -- Yes --> D[Heterogeneity analysis]
     C --> D
+    R --> D
 
     D --> E[Zernike3Deep<br/>continuous motion from a reference]
     D --> F[HetSIREN<br/>real-space heterogeneous reconstruction]
@@ -87,16 +89,27 @@ Before studying *motion*, you need decent **poses** (orientations + shifts) and,
 **consensus map**.
 
 - If your particles already have a good alignment from an upstream package (Relion, Xmipp,
-  cryoSPARC…), you can go straight to Stage 2.
-- If not, or to refine what you have, use **[ReconSIREN](../programs/reconsiren.md)** for an
-  ab initio assignment and an initial volume.
+  cryoSPARC…) **and** a reference map, you can go straight to Stage 2.
+- If they have good poses but **no map** (or one you do not trust), build one with
+  **[Reconstruct Volume](../programs/reconstruct_volume.md)**: the poses alone are enough to
+  recover a consensus map in a single pass, together with the mask derived from it. It reports
+  the resolution it reached (half-map FSC), so you know what you are handing to Stage 2.
+- If the poses themselves are missing or unreliable, use
+  **[ReconSIREN](../programs/reconsiren.md)** for an ab initio assignment and an initial volume.
 
 ```mermaid
 flowchart LR
     A[Raw particles] --> B[ReconSIREN]
     B --> C[poses + shifts]
     B --> D[reconsiren_map.mrc]
+    E[Posed particles] --> F[Reconstruct Volume]
+    F --> G[consensus_reconstruction.mrc<br/>+ consensus_mask.mrc]
 ```
+
+!!! tip "HetSIREN will do it for you"
+    Launched with neither `--vol` nor `--mask`, [HetSIREN](../programs/hetsiren.md) runs this
+    same reconstruction internally. Doing it as an explicit step is worth it when you want to
+    inspect the reference first, tune the mask, or reuse one reference across several runs.
 
 ---
 
@@ -177,6 +190,10 @@ flowchart LR
     B[Zernike3Deep / HetSIREN<br/>motion model] --> C
     C --> D[modart_map.mrc<br/>+ optional half-maps]
 ```
+
+Keep the consensus map from Stage 1 around: reconstructed from the *same* particles with the
+flexibility averaged away, it is the honest baseline against which to judge how much MoDART
+actually sharpened.
 
 ---
 

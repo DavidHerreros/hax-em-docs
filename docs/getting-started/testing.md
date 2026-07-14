@@ -80,8 +80,9 @@ The suite drives the following programs through their CLIs:
 
 `preprocess_particles`, `preprocess_volumes`, `hetsiren`, `reconsiren`, `reconsiren_het_only`,
 `zernike3deep`, `estimate_latent_covariances`, `latent_space_deconvolution`,
-`filter_latents`, `flexconsensus`, `decode_states_from_latents`, `modart`, `annotate_space`,
-`image_gray_scale_adjustment`, `volume_gray_scale_adjustment`, `display_metrics`.
+`filter_latents`, `flexconsensus`, `decode_states_from_latents`, `modart`,
+`reconstruct_volume`, `annotate_space`, `image_gray_scale_adjustment`,
+`volume_gray_scale_adjustment`, `display_metrics`.
 
 Run `python tests/run_tests.py --help` to see the exact, up-to-date list for your version.
 
