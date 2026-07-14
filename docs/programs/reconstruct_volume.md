@@ -79,7 +79,21 @@ It can also derive a **binary mask** of the protein region from the map it just 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `--batch_size` | int | 1024 | Images read and inserted at once. The images are read on a thread pool while the GPU accumulates, so **peak RAM tracks this value, not the number of particles**. Lower it if you run out of memory. |
-| `--threads` | int | 8 | Reader threads feeding the GPU with image chunks. |
+| `--threads` | int | 8 | Reader threads feeding the GPU with image chunks. On a **spinning disk (HDD)**, several threads read different regions of the stack at once and the head seeks between them — try `1` or `2` there, it is often *faster* than the default. |
+| `--ssd_scratch_folder` | path | — | Folder on a fast (SSD/NVMe) disk where the particles are cached as a local **float16** copy (half the bytes) and streamed from. See the note below. |
+
+!!! tip "If your particles live on a slow disk, the read *is* the run"
+    This program touches every particle exactly once, so its wall clock is set by how fast the
+    images arrive. 1M particles at box 320 is **410 GB** — about an hour off a spinning disk,
+    during which the GPU sits idle. `--ssd_scratch_folder` caches the stack on fast storage as
+    float16 and streams from there.
+
+    It does **not** make a single cold run faster: building the cache still costs one full read
+    of the original stack. It pays off because the copy is **reused** — by later runs, and by the
+    other hax programs ([HetSIREN](hetsiren.md), [Zernike3Deep](zernike3deep.md),
+    [MoDART](modart.md)…) pointed at the same scratch folder, which build and read *exactly the
+    same cache*. Whichever program runs first pays for it; everything after reads from the SSD.
+    That matters most for the training programs, which re-read every particle **every epoch**.
 
 ## Example commands
 
@@ -143,3 +157,7 @@ The measured resolution (half-map FSC = 0.143) is printed at the end of the run.
 - Feed the resulting map **and** mask into [HetSIREN](hetsiren.md) / [Zernike3Deep](zernike3deep.md)
   (`--vol` / `--mask`) rather than only the map: the mask is what gives the deformation
   somewhere to act.
+- **If the run feels slow, watch `nvidia-smi` before tuning anything.** A GPU that idles and
+  spikes is starved by the disk, not short of compute — and no parameter here will change that.
+  Reach for `--ssd_scratch_folder`, a lower `--threads`, or a smaller box via
+  [Preprocess Particles](preprocess_particles.md).
