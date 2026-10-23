@@ -166,7 +166,7 @@ Utilities to turn latent spaces into volumes or to clean them up.
 
     ---
 
-    ART-based reconstruction with motion-blur correction from deformation fields.
+    Least-squares reconstruction with motion-blur correction from deformation fields.
 
     [:octicons-arrow-right-24: MoDART](modart.md)
 
