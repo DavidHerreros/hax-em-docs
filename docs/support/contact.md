@@ -77,7 +77,8 @@ attach** — both for bugs and for improvement ideas:
 
 ## Tutorials
 
-Step-by-step tutorials covering the use of Hax together with **Scipion** are in preparation.
+To run Hax inside **Scipion**, see [Using Hax from Scipion](../getting-started/scipion.md).
+Step-by-step tutorials covering the use of Hax together with Scipion are in preparation.
 They will be announced through the project's GitHub repository.
 
 ---

@@ -73,6 +73,10 @@ You should see a summary of every Hax program. If you do, you are ready to go â€
     There is an optional web GUI, `hax-em-gui`, that lets you run every program from your
     browser. See [The Hax GUI](gui.md).
 
+!!! info "Working in Scipion?"
+    The `scipion-em-hax` plugin installs Hax in its own environment and exposes the programs
+    as Scipion protocols. See [Using Hax from Scipion](scipion.md).
+
 !!! warning "If JAX cannot see your GPU"
     If programs run very slowly or report that no GPU was found:
 

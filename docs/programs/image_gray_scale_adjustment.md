@@ -2,25 +2,25 @@
 
 !!! abstract "At a glance"
     **CLI name:** `image_gray_scale_adjustment` · **Family:** Gray-scale adjustment
-    · **Trains a network:** yes · **Modes:** `train`, `predict`
+    · **Trains a network:** no · **Modes:** none (a single pass over the particles)
 
 ## What it does
 
-The intensity ("gray") levels of projections generated from a volume rarely match those of
-your experimental images exactly — they differ in scale and offset. **Image Gray-Scale
-Adjustment** learns the transformation that makes the projections of a volume **match a set
-of experimental images**, so the two can be compared or combined on a common intensity scale.
+The contrast of the particles in a data set is not uniform: ice thickness, defocus and dose
+make some images brighter or darker than others. **Image Gray-Scale Adjustment** measures that
+contrast for every particle and corrects it.
 
-The adjustment can be learned at two granularities:
-
-- **per pixel** (default) — a detailed, spatially-varying correction.
-- **per projection** — a single scale/offset per image, via `--predict_value`.
+Each image is compared with the reference volume **projected at the particle's pose**, with
+its shift and CTF applied. The gray scale of the image (and, optionally, an offset) is the
+least-squares fit of the image to that projection, solved in closed form — the same per-image
+contrast fit HetSIREN uses during training. The images are then rescaled and written as a new
+stack.
 
 ## When to use it
 
-- To put generated projections and experimental images on the **same gray scale** before a
-  comparison, subtraction, or downstream step that assumes matched intensities.
-- As a preparatory/normalization step in pipelines that mix synthetic and experimental data.
+- Before a heterogeneity analysis, so that differences in contrast between particles are not
+  mistaken for differences in density.
+- To put the particles on the gray scale of a reference map (`--per_image_contrast absolute`).
 
 ## Parameters
 
@@ -28,53 +28,33 @@ The adjustment can be learned at two granularities:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| `--md` | path | Metadata file with the images (plus alignments / CTF) — Xmipp `.xmd`, Relion `.star`, or CryoSPARC `.cs` (read directly). |
-| `--vol` | path | Volume used to generate the projections to be adjusted. |
+| `--md` | path | Metadata file with the images, their poses and CTF — Xmipp `.xmd`, Relion `.star`, or CryoSPARC `.cs` (read directly). |
+| `--vol` | path | Reference volume. It must have the same box and sampling rate as the images. |
 | `--sr` | float | Sampling rate (pixel size), in Å/px. |
-| `--ctf_type` | choice | `None`, `apply`, `wiener`, or `precorrect`. |
-| `--mode` | choice | `train` or `predict` (predict needs `--reload`). |
-| `--output_path` | path | Folder where results are saved. |
+| `--ctf_type` | choice | `None`, `apply`, `wiener`, `precorrect` or `premultiplied` (see below). |
+| `--output_path` | path | Folder where results are saved (created if needed). |
 
-### Adjustment configuration
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `--mask` | path | sphere | Focus the adjustment on a region of interest. If omitted, an inscribed spherical mask is used. |
-| `--predict_value` | flag | off | Estimate the adjustment **per projection** (one value) instead of the default **per pixel**. |
-| `--lat_dim` | int | 3 | Dimensionality of the network's latent space. |
-
-### Training control
+### Adjustment
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `--epochs` | int | 50 | Passes over the dataset. |
-| `--batch_size` | int | 64 | Images on the GPU at once (GPU-memory lever). |
-| `--learning_rate` | float | 1e-5 | Step size of learning; lower ~10× if it diverges. |
-| `--dataset_split_fraction` | list | 0.8,0.2 | Train/validation split (must sum to 1). |
-| `--reload` | path | — | A saved network to fine-tune or to run `predict`. |
+| `--per_image_contrast` | choice | `relative` | `relative`: each image is divided by its gray scale relative to the mean of the data set, so the contrast becomes even while the overall gray level is kept. `absolute`: each image is divided by its own gray scale, which puts every particle on the gray scale of the reference volume. |
+| `--fit_offset` | flag | off | Also fit and subtract an offset per image (`image = scale × projection + offset`). By default only the scale is fitted, which assumes images normalized to a zero-mean background. |
+| `--mask` | path | — | Binary mask of the region to match. The fit then only uses the pixels inside the projection of the mask. Without it, the whole image is used. |
+
+`--ctf_type` says what the stored images contain: `apply`, `wiener` and `precorrect` all mean
+raw images that carry their CTF, so the CTF is applied to the projections; `premultiplied`
+means the images were already multiplied by their CTF; `None` means they carry no CTF at all.
 
 ### Data loading
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `--load_images_to_ram` | flag | off | Load all images into RAM (fastest). Otherwise memory-mapped. |
-| `--ssd_scratch_folder` | path | — | Fast-SSD folder used when memory-mapping. |
+| `--batch_size` | int | 256 | Images read and projected at once. Lower it if the GPU runs out of memory; it does not change the result. |
+| `--threads` | int | 8 | Reader threads feeding the GPU. On a spinning disk, 1 or 2 can be faster. |
+| `--ssd_scratch_folder` | path | — | Fast-disk folder where the images are cached (as `float16`) and read from — the same cache the other Hax programs build there. |
 
-## Example commands
-
-**Train** a per-pixel adjustment:
-
-```bash
-hax_project_manager --gpu 0 image_gray_scale_adjustment \
-    --md particles.xmd \
-    --vol reference.mrc \
-    --sr 1.5 \
-    --ctf_type apply \
-    --mode train \
-    --output_path img_adjust_run/
-```
-
-**Predict** the adjusted images (per-projection adjustment):
+## Example command
 
 ```bash
 hax_project_manager --gpu 0 image_gray_scale_adjustment \
@@ -82,32 +62,26 @@ hax_project_manager --gpu 0 image_gray_scale_adjustment \
     --vol reference.mrc \
     --sr 1.5 \
     --ctf_type apply \
-    --predict_value \
-    --mode predict \
-    --reload img_adjust_run/ \
-    --output_path img_adjust_predict/
+    --output_path img_adjust/
 ```
 
 ## Outputs
 
-After **train**:
-
-- `imageAdjustment/` — the trained network, plus `Image_adjustment_metrics/` and
-  `imageAdjustment_CHECKPOINT/`.
-- `mask.mrc` — the spherical mask, when you did not supply one.
-
-After **predict**:
-
 - `adjusted_images.mrcs` — the adjusted image stack.
-- `adjusted_images.<ext>` — a new metadata file pointing at the adjusted images. With
-  `--predict_value`, it also records `adjustment_a` and `adjustment_b` columns (the per-image
-  scale and offset).
+- `adjusted_images.<ext>` — a copy of the input metadata pointing at the adjusted images, with
+  two new columns, `adjustment_a` and `adjustment_b`: each adjusted image is
+  `adjustment_a × image + adjustment_b`.
 
 ## Tips & pitfalls
 
-- Use a **mask** to keep the adjustment focused on the molecule rather than background noise.
-- Choose **per-pixel** (default) for spatially-varying corrections, or **per-projection**
-  (`--predict_value`) when a single scale/offset per image is enough and you want the
-  numeric coefficients.
-- See also [Volume Gray-Scale Adjustment](volume_gray_scale_adjustment.md), the volume-side
-  counterpart.
+- The fit needs **reliable poses** and the **right CTF type**. If most images come out
+  anti-correlated with the projections, the program stops: check that the images and the
+  volume have the same contrast (protein white) and that `--ctf_type` matches the data.
+- Images whose projection explains nothing (empty or badly aligned particles) are not
+  amplified into noise: they get the median scale, and every scale is kept within 5× of the
+  median. The program reports how many images this affected.
+- Up to a box of 256 px the projections are computed from a 2× oversampled transform, which
+  keeps the fitted scales accurate to about 1%; above that size they are computed without
+  oversampling to save memory, and are slightly less accurate.
+- See also [Volume Gray-Scale Adjustment](volume_gray_scale_adjustment.md), which fits one
+  scale for the volume instead.

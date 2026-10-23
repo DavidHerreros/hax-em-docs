@@ -2,26 +2,25 @@
 
 !!! abstract "At a glance"
     **CLI name:** `volume_gray_scale_adjustment` · **Family:** Gray-scale adjustment
-    · **Trains a network:** yes · **Modes:** `train`, `predict`
+    · **Trains a network:** no · **Modes:** none (a single pass over the particles)
 
 ## What it does
 
-This is the **volume-side counterpart** of
-[Image Gray-Scale Adjustment](image_gray_scale_adjustment.md). It adjusts the intensity
-("gray") levels of a **volume** so that they match a set of experimental images. The result
-is a volume placed on the same intensity scale as your data — useful before comparison,
-combination, or further processing.
+A map obtained elsewhere (another program, another data set, a simulation) is rarely on the
+gray scale of your particles. **Volume Gray-Scale Adjustment** finds the **single scale** that
+makes the projections of the map match the images, and applies it to the map.
 
-The adjustment can be learned:
-
-- **per voxel** (default) — a detailed, spatially-varying correction.
-- **for the whole volume** — a single transformation, via `--predicts_value`.
+The map is projected at the pose of every particle, with its shift and CTF applied, and the
+scale is the least-squares fit of all the images to those projections, solved in closed form.
+The output is the **input map multiplied by that scale**: nothing is resampled, masked or
+fitted with Gaussians, and no offset is added (a constant in the map would also fill the
+background).
 
 ## When to use it
 
-- To bring a volume's gray levels in line with a set of experimental images.
-- As a normalization step when combining maps from different sources or with experimental
-  data.
+- Before using a map as the reference of a program that compares its projections with the
+  images (HetSIREN, Zernike3Deep, MoDART...), when the map does not come from these particles.
+- To compare or combine maps from different sources on the gray scale of the same images.
 
 ## Parameters
 
@@ -29,53 +28,28 @@ The adjustment can be learned:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| `--vol` | path | The volume to be adjusted according to the images. |
+| `--md` | path | Metadata file with the images, their poses and CTF — Xmipp `.xmd`, Relion `.star`, or CryoSPARC `.cs` (read directly). |
+| `--vol` | path | Map to adjust. It must have the same box and sampling rate as the images. |
 | `--sr` | float | Sampling rate (pixel size), in Å/px. |
-| `--ctf_type` | choice | `None`, `apply`, `wiener`, or `precorrect`. |
-| `--mode` | choice | `train` or `predict` (predict needs `--reload`). |
-| `--output_path` | path | Folder where results are saved. |
+| `--ctf_type` | choice | `None`, `apply`, `wiener`, `precorrect` or `premultiplied` (as in [Image Gray-Scale Adjustment](image_gray_scale_adjustment.md#parameters)). |
+| `--output_path` | path | Folder where results are saved (created if needed). |
 
-### Inputs & adjustment configuration
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `--md` | path | — | Metadata file with the images (plus alignments / CTF) the volume is matched against — Xmipp `.xmd`, Relion `.star`, or CryoSPARC `.cs` (read directly). |
-| `--mask` | path | sphere | Focus the adjustment on a region of interest. If omitted, an inscribed spherical mask is used. |
-| `--predicts_value` | flag | off | Estimate one adjustment for the **whole volume** instead of the default **per-voxel** correction. |
-| `--lat_dim` | int | 3 | Dimensionality of the network's latent space. |
-
-### Training control
+### Adjustment
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `--epochs` | int | 50 | Passes over the dataset. |
-| `--batch_size` | int | 64 | Images on the GPU at once (GPU-memory lever). |
-| `--learning_rate` | float | 1e-5 | Step size of learning; lower ~10× if it diverges. |
-| `--dataset_split_fraction` | list | 0.8,0.2 | Train/validation split (must sum to 1). |
-| `--reload` | path | — | A saved network to fine-tune or to run `predict`. |
+| `--fit_offset` | flag | off | Allow an offset per image while fitting the scale. Use it when the images are not normalized to a zero-mean background. The offsets are not applied to the map. |
+| `--mask` | path | — | Binary mask of the region to match. The fit then only uses the pixels inside the projection of the mask. The scale is applied to the whole map either way. |
 
 ### Data loading
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `--load_images_to_ram` | flag | off | Load all images into RAM (fastest). Otherwise memory-mapped. |
-| `--ssd_scratch_folder` | path | — | Fast-SSD folder used when memory-mapping. |
+| `--batch_size` | int | 256 | Images read and projected at once. Lower it if the GPU runs out of memory; it does not change the result. |
+| `--threads` | int | 8 | Reader threads feeding the GPU. On a spinning disk, 1 or 2 can be faster. |
+| `--ssd_scratch_folder` | path | — | Fast-disk folder where the images are cached (as `float16`) and read from — the same cache the other Hax programs build there. |
 
-## Example commands
-
-**Train** a per-voxel volume adjustment against a set of images:
-
-```bash
-hax_project_manager --gpu 0 volume_gray_scale_adjustment \
-    --md particles.xmd \
-    --vol reference.mrc \
-    --sr 1.5 \
-    --ctf_type apply \
-    --mode train \
-    --output_path vol_adjust_run/
-```
-
-**Predict** the adjusted volume:
+## Example command
 
 ```bash
 hax_project_manager --gpu 0 volume_gray_scale_adjustment \
@@ -83,29 +57,23 @@ hax_project_manager --gpu 0 volume_gray_scale_adjustment \
     --vol reference.mrc \
     --sr 1.5 \
     --ctf_type apply \
-    --mode predict \
-    --reload vol_adjust_run/ \
-    --output_path vol_adjust_predict/
+    --output_path vol_adjust/
 ```
 
 ## Outputs
 
-After **train**:
-
-- `volumeAdjustment/` — the trained network, plus `Volume_adjustment_metrics/` and
-  `volumeAdjustment_CHECKPOINT/`.
-- `mask.mrc` — the spherical mask, when you did not supply one.
-
-After **predict**:
-
-- `adjusted_volume.mrc` — the gray-level-adjusted volume. With `--predicts_value` a single
-  per-volume adjustment is applied; otherwise voxel values in the masked region are replaced
-  by the learned per-voxel correction.
+- `adjusted_volume.mrc` — the input map multiplied by the fitted scale.
+- `gray_scale.txt` — the scale itself, so it can be applied to other copies of the map (for
+  example, the same map at a different box).
 
 ## Tips & pitfalls
 
-- Provide a **mask** to focus the adjustment on the molecule.
-- Choose **per-voxel** (default) for fine spatial control, or `--predicts_value` for a single
-  global correction.
-- For the image-side equivalent, see
+- The fit needs **reliable poses** and the **right CTF type**. If the projections come out
+  anti-correlated with the images, the program stops: check that the images and the map have
+  the same contrast (protein white) and that `--ctf_type` matches the data.
+- Every particle is used, so the scale is very precise; what limits it is how well the map
+  and the poses describe the data.
+- [Reconstruct Volume](reconstruct_volume.md) already calibrates the gray scale of the maps it
+  reconstructs, so they do not need this step.
+- For a per-particle correction instead, see
   [Image Gray-Scale Adjustment](image_gray_scale_adjustment.md).
