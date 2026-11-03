@@ -112,7 +112,7 @@ Match intensity levels between maps and images before further analysis.
 
     ---
 
-    Adjust volume projections to match a set of experimental images.
+    Even out the contrast of the particles against the projections of a map (closed form).
 
     [:octicons-arrow-right-24: Image Gray-Scale Adjustment](image_gray_scale_adjustment.md)
 
@@ -120,7 +120,7 @@ Match intensity levels between maps and images before further analysis.
 
     ---
 
-    Adjust a volume's gray levels towards a set of images.
+    Put a map on the gray scale of a set of particles (closed form).
 
     [:octicons-arrow-right-24: Volume Gray-Scale Adjustment](volume_gray_scale_adjustment.md)
 
@@ -166,7 +166,7 @@ Utilities to turn latent spaces into volumes or to clean them up.
 
     ---
 
-    ART-based reconstruction with motion-blur correction from deformation fields.
+    Least-squares reconstruction with motion-blur correction from deformation fields.
 
     [:octicons-arrow-right-24: MoDART](modart.md)
 
@@ -208,8 +208,8 @@ Utilities to turn latent spaces into volumes or to clean them up.
 | [FlexConsensus](flexconsensus.md) | `flexconsensus` | Consensus | ✅ |
 | [Estimate Latent Covariances](estimate_latent_covariances.md) | `estimate_latent_covariances` | Consensus | ❌ |
 | [Latent Space Deconvolution](latent_space_deconvolution.md) | `latent_space_deconvolution` | Consensus | ✅ |
-| [Image Gray-Scale Adjustment](image_gray_scale_adjustment.md) | `image_gray_scale_adjustment` | Adjustment | ✅ |
-| [Volume Gray-Scale Adjustment](volume_gray_scale_adjustment.md) | `volume_gray_scale_adjustment` | Adjustment | ✅ |
+| [Image Gray-Scale Adjustment](image_gray_scale_adjustment.md) | `image_gray_scale_adjustment` | Adjustment | ❌ |
+| [Volume Gray-Scale Adjustment](volume_gray_scale_adjustment.md) | `volume_gray_scale_adjustment` | Adjustment | ❌ |
 | [Decode States from Latents](decode_states_from_latents.md) | `decode_states_from_latents` | Post-processing | ❌ |
 | [Filter Latents](filter_latents.md) | `filter_latents` | Post-processing | ❌ |
 | [Reconstruct Volume](reconstruct_volume.md) | `reconstruct_volume` | Reconstruction | ❌ |

@@ -122,6 +122,7 @@ nav:
       - Verify Your Installation: getting-started/testing.md
       - The Command Line: getting-started/cli.md
       - The Hax GUI: getting-started/gui.md
+      - Using Hax from Scipion: getting-started/scipion.md
       - Core Concepts: getting-started/concepts.md
   - Programs:
       - Overview: programs/index.md

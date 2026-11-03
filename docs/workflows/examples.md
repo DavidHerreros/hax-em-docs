@@ -133,7 +133,8 @@ hax_project_manager --gpu 0 modart \
 ```
 
 You now have `07_modart/modart_map.mrc` (and half-maps for resolution estimation) that is
-sharper in the flexible regions than a plain average would be.
+sharper in the flexible regions than a plain average would be. `07_modart/half_map_fsc.txt`
+holds the half-map FSC that filtered it.
 
 ---
 
