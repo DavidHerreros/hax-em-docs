@@ -197,7 +197,8 @@ flexibility averaged away, it is the honest baseline against which to judge how 
 actually sharpened.
 
 Give MoDART the particles **with the poses the motion model was trained on**: it adds the
-network's pose refinement on top of them. The MoDART map can go back in as a sharper
+network's pose refinement on top of them. Particles from a `predict` run already carry that
+refinement: pass them with `--poses_refined_by <network>`. The MoDART map can go back in as a sharper
 reference: fine-tune the same network on it with `--reload` and `--refit_reference`, then
 reconstruct again. MoDART's `--refine_iterations` repeats this loop for you
 ([iterative refinement](../programs/modart.md#iterative-refinement)).

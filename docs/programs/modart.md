@@ -80,6 +80,7 @@ runs as its own process, so each one gets the whole GPU.
 |--------|------|---------|-------------|
 | `--motion_correction` | path(s) | — | Path to a trained **HetSIREN (with transport of mass)** or **Zernike3Deep** network (the `HetSIREN` / `Zernike3Deep` folder). When given, each particle's deformation field and refined pose are used in the reconstruction; otherwise a standard reconstruction is performed. Two paths (gold standard): the first network moves the even particles (first half), the second the odd ones. |
 | `--field_smoothing` | float | 0.0 | Width, in Å, of a local-linear Gaussian smoothing of each particle's motion field. It removes non-rigid jitter while keeping rigid (and affine) motions exact. `0` disables it. |
+| `--poses_refined_by` | path | — | Network whose pose refinement the input poses already include (e.g. the particles written by its `predict`). MoDART removes it before applying the refinement of `--motion_correction`, so it is not applied twice. |
 | `--remove_mean_field` | flag | off | Subtract each network's particle-average motion field, so the map is reconstructed in the frame of the network's reference. It removes a static deformation the network may learn (e.g. to sharpen a blurred reference by moving its points), which otherwise distorts the map. |
 
 ### Refinement
@@ -179,7 +180,8 @@ network), and each iteration `N` leaves:
 - With `--motion_correction`, pass the metadata **with the poses the network was trained on**.
   MoDART applies the network's pose refinement on top of them, so the `predicted_latents`
   metadata of a `predict` run, whose poses already include that refinement, would refine them
-  twice.
+  twice. With such metadata, add `--poses_refined_by <network>`: MoDART then removes that
+  refinement first.
 - `--refine_iterations` needs the network folder as the training wrote it
   (`<output_path>/HetSIREN` or `<output_path>/Zernike3Deep`) and its `run_config.json` (next to
   it, or given with `--refine_config`). A HetSIREN must have been trained with transport of
