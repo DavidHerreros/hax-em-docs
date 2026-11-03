@@ -63,6 +63,10 @@ You can also pass any of these options through a YAML/JSON file with `--config` 
 | `--lat_dim` | int | 8 | Dimensionality of the latent space. |
 | `--L1` | int | 7 | Degree of the Zernike3D **radial** component. Higher captures more localized motion at higher memory cost. |
 | `--L2` | int | 7 | Degree of the Zernike3D **angular** component. Higher captures more localized motion at higher memory cost. |
+| `--basis` | choice | `zernike` | Deformation basis. `zernike`: global Zernike3D polynomials (`--L1`, `--L2`); `patches`: blended local affine patches over the Gaussians, more local motion per coefficient (e.g. domain motions around hinges). |
+| `--num_patches` | int | 30 | Number of patches of `--basis patches` (4 coefficients per patch and axis). |
+| `--patch_width` | float | 0.4 | Width of the patch blending weights of `--basis patches`, as a fraction of the mean spacing between patch centres. |
+| `--patch_rigidity` | float | 0.0 | Weight, relative to the edge strain, of a penalty on the stretch and shear of each patch of `--basis patches` (Green strain of its local affine fit), so patches move rigidly. Part of the deformation prior scaled by `--deformation_strength`; `0` disables it. |
 | `--num_gaussians` | int | auto | Number of Gaussians fitted to the reference volume before training. By default the count is grown until the fit reaches FSC ≥ 0.5 on every populated shell (see `--fit_resolution`); set it to fix the number yourself (e.g. to the residue count). |
 | `--fit_resolution` | float | — | Resolution (Å) the automatic Gaussian fit has to reproduce. |
 | `--deformation_strength` | float | 0.3 | Strength of the graph deformation priors (relative edge strain + repulsion) with respect to the reconstruction loss. After the first epoch the prior weight is set once (then kept fixed) so its gradient on the decoder is this fraction of the reconstruction gradient. Lower for larger motions, higher for stiffer ones; `0` disables it. |
@@ -105,6 +109,12 @@ You can also pass any of these options through a YAML/JSON file with `--config` 
 | `--learning_rate` | float | 1e-4 | Step size of learning; lower ~10× if it diverges. |
 | `--dataset_split_fraction` | list | 0.8,0.2 | Train/validation split (must sum to 1). |
 | `--reload` | path | — | A saved network to fine-tune or to run `predict`. Because Zernike3Deep also learns a gray-level adjustment, this folder must contain both `Zernike3Deep` and `Gaussian_volume_fitting` subfolders. |
+
+### Reference update
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `--refit_reference` | flag | off | With `--reload` in `train` mode: fit the Gaussians to `--vol` (e.g. a [MoDART](modart.md) map) and fine-tune the reloaded network on them. The architecture of the reloaded network is kept, and every weight whose shape still matches is reused. A patch basis keeps its patch centres, so the reloaded coefficients keep their meaning. [MoDART](modart.md)'s `--refine_iterations` runs this fine-tune for you. |
 
 ### Logging
 
@@ -175,7 +185,9 @@ After **predict**:
 
 - A **reference volume is mandatory** — Zernike3Deep deforms it. Make sure `--sr` matches
   both the volume and the images.
-- Increase `--L1` / `--L2` to chase very localized motions, but watch GPU memory.
+- Increase `--L1` / `--L2` to chase very localized motions, but watch GPU memory. For domain
+  motions around hinges, `--basis patches` gives more local motion per coefficient; add
+  `--patch_rigidity` to keep each patch rigid.
 - Domains that should move as rigid blocks? Try `--strain_penalty bounded`, and lower
   `--deformation_strength` for large-amplitude motions.
 - To get a compact, ordered latent space, combine `--nested_dropout` with

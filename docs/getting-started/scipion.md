@@ -151,6 +151,7 @@ raise the expert level in the protocol form. A few fields deserve a note:
 | Fine tune previous network? (HetSIREN) | `--reload <previous run>` | Point it at an earlier **flexible align - HetSIREN** run. |
 | Reconstruction mode (MoDART) | `--reconstruct_halves` | *Gold standard* keeps the two unfiltered half maps. |
 | Correct motion blurred artifacts? (MoDART) | `--motion_correction <network>` | Uses the network stored with the input particles. |
+| Refinement iterations (MoDART) | `--refine_iterations` | Fine-tunes that network with the parameters of its training run. It must have been trained on the particles at their original size (no downsampling). |
 
 ---
 
